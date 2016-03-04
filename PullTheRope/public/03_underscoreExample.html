@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+			_underscore example
+		</title>
+		<script type="text/template" id="the_example">
+			<h2><%= name %></h2>
+			<p><%= description %></p>
+		</script>
+	</head>
+	<body>
+		<h1>_underscore example</h1>
+		<p>
+			<big><strong>
+				<a href="#" onclick="addDude(); return false;" title="add a dude.">+</a>
+			</strong></big>
+		</p>
+		<div id="people"></div>	
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+		<script>
+			var dudeNames = ['Alice', 'Bob', 'Cecil', 'Dan', 'Elisa'];
+			var dudeDescriptions = ['A nice girl', 'Beware of him!', 'Wears hat', 'The man', 'Always sad'];
+			var template = _.template($('#the_example').html());
+			var i = 0;
+			function addDude(){
+				$('#people').html(template({
+					name: dudeNames[i],
+					description: dudeDescriptions[i]
+				}));
+				i++;
+				i%=dudeNames.length;
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,296 @@
+<!-- .header -->
+<section id="content2" style="" class="composer_content" style="padding-top: 65px">
+    <div id="fws_5476fa058e710" class="wpb_row animate_onoffset  vc_row-fluid  animate_onoffset row-dynamic-el full-width-content section-style   " style="padding-top: 0px !important; padding-bottom: 0px !important;">
+        <div class="col span_12  dark">
+            <div class="vc_col-sm-12 wpb_column column_container" style="" data-animation="" data-delay="0">
+                <div class="wpb_wrapper">
+                    <div class="wpb_content_element dynamic_page_header style_1">
+                        <h1 style="font-size:100px; font-family:Bebas Neue; color:#009dd4; margin-top: 50px;">PULL THE ROPE </h1>
+                        <div class="line_under">
+                            <div class="line_left"></div>
+                            <div class="line_center"></div>
+                            <div class="line_right"></div>
+                        </div>
+                        <p class="description"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    html{
+        text-align: center;
+    }
+        #cuerdaSuperior{position:absolute;left: 350px; top: 25px;background-color: black;left: 49%; top: 69px;}
+        #cuerda{background-color: black; height: 5px; width: 700px;position: absolute; top: 94px;}
+        #start{background-color: white; z-index: 1; height: 300px; width: 700px;}
+        #cuentaAtras{background-color: white; z-index: 2; height: 300px; width: 700px;}
+        #game{background-color: white; z-index: 3; height: 300px; width: 700px;}
+        #end{background-color: white; z-index: 4; height: 300px; width: 700px;}
+    </style>
+    <script src="http://code.jquery.com/jquery-2.1.4.js"></script>
+    <script>
+        var interval;
+        var cuerda;
+        var contador=0;
+        var POSICION_GLOBAL;
+        var cuentaAtras;
+        var intCuentAtras;
+        var direccion = 0;
+        var movimiento = 0;
+
+        function preparate(){
+            $('#start').hide();
+            $('#end').hide();
+            $('#game').hide();
+            $('#cuentaAtras').show();
+            var i = 3;
+            $('#tiempo').html(i);
+            intCuentAtras = setInterval(function(){
+                $('#tiempo').html(i-1);
+                i-=1;
+                if(i==0){
+                    play();
+                }
+                console.log(i);
+            },1000);
+        };
+
+        function moverConTecla() {
+                var posicionCuerdaLeft = ($('#cuerdaSuperior').css('left'));
+                var posicionCuerda = posicionCuerdaLeft.split('p');
+                document.getElementById('cuerdaSuperior').style.left = (parseFloat(posicionCuerda[0]) - parseFloat(movimiento)) + 'px';
+        };
+
+        function restart(){
+            contador = 0;
+            $('#cuerdaSuperior').css('left', POSICION_GLOBAL);
+            $('#end').hide();
+            $('#game').show();
+            preparate();
+        };
+
+        function teclaListener(tecla){
+                if (tecla.keyCode == 74) { // TECLA J
+                  //  moverConTecla();
+                  socket.emit('estira', {direccion: direccion, cont: contador});
+                };
+        };
+
+        function fin(resultado){
+            $(document).unbind("keyup",teclaListener);  
+            clearInterval(interval);        
+            var mensaje;
+            //socket.emit('partidaFin', {msg: 'true'});
+            if(resultado>0&&direccion>0 || resultado<0&&direccion<0){
+                mensaje = 'GANADO';
+            }else{mensaje='PERDIDO';}
+            $('#textoRes').html('<h1>HAS '+mensaje+'</h1>');
+            $('#game').hide();
+            $('#end').show();
+            $("#leftMan").hide();
+            $("#rightMan").hide();
+        };
+
+        function play(){
+            clearInterval(intCuentAtras);
+            $('#cuentaAtras').hide();
+            $('#game').show();
+            $("#cuerdaSuperior").show();
+            $("#cuerda").show();
+            $("#leftMan").show();
+            $("#rightMan").show();
+
+            $(document).keyup(teclaListener);
+          /*  interval = setInterval(function() {
+                var a = ($('#cuerdaSuperior').css('left'));
+                a = a.split('p');
+                console.log(a[0]);
+                document.getElementById('cuerdaSuperior').style.left = (parseInt(a[0]) + 6) + 'px';
+                contador += 1;
+                console.log(contador);
+                if(contador>=15){fin(contador);}
+            },280);
+        */
+        };      
+
+        $( document ).ready(function(){
+            clearInterval(interval);
+            POSICION_GLOBAL = ($('#cuerdaSuperior').css('left'));
+            $('#cuentaAtras').hide();
+            $('#game').hide();
+            $('#end').hide();
+            $("#cuerdaSuperior").hide();
+            $("#cuerda").hide();
+            $("#leftMan").hide();
+            $("#rightMan").hide();
+
+        });
+
+
+    </script>   
+
+<div class="top_wrapper no-transparent" style="padding-top: 15px;">
+        <div style="margin-left : 25%;">
+            <div id="start">
+                <button id="jugar" class="btn btn-primary" onclick="preparate(); socket.emit('empezarPartida', {msg: 'New player'});" style="margin-top: 80px;">JUGAR</button>
+            </div>
+            <div id="cuentaAtras"><h1>GET READY!!</h1>
+                <p id="tiempo"></p>
+            </div>
+            <div id="game">
+                <div id="cuerda"></div>
+                <img id="cuerdaSuperior" src="images/lazo.PNG"/>
+            </div>
+            <div id="end">
+                <p id="textoRes"></p>
+                <button id="jugar" class="btn btn-primary" onclick="restart()">VOLVER A JUGAR</button>
+            </div>
+        </div>
+</div>
+
+<div id="leftMan" style="position: absolute; margin-left: 400px;margin-top: 259px; z-index: 1;">
+    <img id="lman" src="images/char2_sinfnodo.PNG"  style="height: 161px; width: 100px;"/>
+</div>
+<div id="rightMan" style="position: absolute; margin-left: 850px;margin-top: 259px; z-index: 1;">
+    <img id="rman" src="images/char1_sinfnodo.PNG"  style="height: 161px; width: 100px;"/>
+</div>
+
+            <div id="fws_5476fa058f2aa" class="wpb_row animate_onoffset  vc_row-fluid  animate_onoffset row-dynamic-el section-style   " style="padding-top: 60px !important; padding-bottom: 60px !important;">
+                <div class="container  dark">
+                    <div class="section_clear">
+                        <div class="vc_col-sm-12 wpb_column column_container" style="" data-animation="" data-delay="0">
+                            <div class="wpb_wrapper">
+                                <div class="divider__ solid_border"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+            <div id="fws_5476fa058fa8c" class="wpb_row animate_onoffset  vc_row-fluid  animate_onoffset row-dynamic-el section-style   " style="background-color: #ffffff; padding-top: 0px !important; padding-bottom: 0px !important;">
+                <div class="container  dark">
+                    <div class="section_clear">
+                        <div class="vc_col-sm-12 wpb_column column_container" style="" data-animation="" data-delay="0">
+                            <div class="wpb_wrapper">
+                                <div id="fws_5476fa0590116" class="wpb_row animate_onoffset  vc_row-fluid  animate_onoffset row-dynamic-el standard_section   " style="padding-top: 0px !important; padding-bottom: 0px !important;">
+                                    <div class="container  dark">
+                                        <div class="section_clear">
+                                            <div class="vc_col-sm-4 wpb_column column_container" style="" data-animation="" data-delay="0">
+                                                <div class="wpb_wrapper">
+                                                    <div class=" services_small wpb_content_element">
+                                                        <div class="services_small_container">
+                                                            <div class=" services_small_icon" style=""><i class="moon-pencil-6" style="color:;"></i> 
+                                                            </div>
+                                                            <div class="services_small_title">
+                                                                <h4><a href="#">BANDO PP</a></h4>
+                                                                <p style="align: justify;">Ayuda a tus amigos del PP a conseguir que España quede unida pero pobre. Por cada victoria
+                                                                te llevar&aacute;s un sobre.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="vc_col-sm-4 wpb_column column_container" style="" data-animation="" data-delay="0">
+                                                <div class="wpb_wrapper">
+                                                    <div class=" services_small wpb_content_element">
+                                                        <div class="services_small_container">
+                                                            <div class=" services_small_icon" style=""><i class="moon-earth" style="color:;"></i> 
+                                                            </div>
+                                                            <div class="services_small_title">
+                                                                <h4><a href="#">Instrucciones</a></h4>
+                                                                <p>Pulsa "J" para tirar de la cuerda. Ganas si arrastras el lazo hacia ti, sino pierdes.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="vc_col-sm-4 wpb_column column_container" style="" data-animation="" data-delay="0">
+                                                <div class="wpb_wrapper">
+                                                    <div class=" services_small wpb_content_element">
+                                                        <div class="services_small_container">
+                                                            <div class=" services_small_icon" style=""><i class="linecon-icon-phone" style="color:;"></i> 
+                                                            </div>
+                                                            <div class="services_small_title">
+                                                                <h4><a href="#">Bando CUP</a></h4>
+                                                                <p>Ayuda a tus amigos de la CUP a separar Catalunya de Espanya. Volem llibertat per la nostra
+                                                                terra, suma punts per la vict&oacute;ria.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div id="fws_5476fa05b3658" class="wpb_row animate_onoffset  vc_row-fluid  animate_onoffset row-dynamic-el section-style   " style="padding-top: 30px !important; padding-bottom: 30px !important;">
+                <div class="container  dark">
+                    <div class="section_clear">
+                        <div class="vc_col-sm-12 wpb_column column_container" style="" data-animation="" data-delay="0">
+                            <div class="wpb_wrapper">
+                                <div class="textbar-container wpb_content_element  style_1" style="background:#f6f6f6; ;">
+                                    <h1 style="color: #000000">Compara tu puntuaci&oacute;n con la de tus oponentes en nuestro ranking Online.</h1>
+                                    <a href="#" class="btn-system normal second_btn" >Entrar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+           
+
+        </section>
+
+        <a href="#" class="scrollup">Scroll</a> 
+        <!-- Social Profiles -->
+
+
+        <!-- Footer -->
+    </div>
+    <script>
+        socket.on('direccion', function(data){
+              if(data["direccion"] == 1) {
+                direccion = 6;
+              } else {
+                direccion = -6;
+              }
+              contador = data["cont"];
+              console.info("posicionCuerdaInicial: "+data["posicion"]+" contador: "+data["cont"]+" - "+contador);
+              document.getElementById('cuerdaSuperior').style.left = data["posicion"]+"px";
+        });
+
+        socket.on('estira', function(msg){
+              movimiento = msg["estiraLugar"];
+              if(movimiento > 0) {
+                contador++;
+              } else {
+                contador--;
+              }
+              moverConTecla();          
+              if(contador <= (-15) || 15 <= contador){
+            //    alert("GAME OVER "+contador);
+                fin(contador);
+              }
+        });
+
+
+
+        socket.on('posicionCuerda', function(pos){
+            document.getElementById('cuerdaSuperior').style.left = pos+"px";
+        });
+
+
+
+        socket.on('setContador', function(cont){
+            contador = cont["cont"];
+        });
+    </script>
